@@ -1,8 +1,9 @@
-package com.digitalistgroup.springbootcodingassignment.controllers;
+package com.digitalistgroup.springbootcodingassignment.controller;
 
-import com.digitalistgroup.springbootcodingassignment.models.ValidateSSNRequestModel;
-import com.digitalistgroup.springbootcodingassignment.models.ValidateSSNResponseModel;
+import com.digitalistgroup.springbootcodingassignment.model.ValidateSSNRequestModel;
+import com.digitalistgroup.springbootcodingassignment.model.ValidateSSNResponseModel;
 import com.digitalistgroup.springbootcodingassignment.validation.SSNValidationHandler;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,8 +46,8 @@ public class SSNValidationControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("invalidSSNRequestsToValidate")
-    public void shouldReturn200OkAndFalseWhenSSNRequestInvalid(String ssn, String countryCode, boolean expected) throws Exception {
+    @MethodSource("ssnRequestsToValidate")
+    public void shouldReturn200OkAndValidationStatusForARequest(String ssn, String countryCode, boolean expected) throws Exception {
         MockHttpServletResponse response = mvc.perform(
                 post("/validate_ssn/").contentType(MediaType.APPLICATION_JSON_VALUE).content(
                         requestTester.write(new ValidateSSNRequestModel(ssn, countryCode)).getJson()
@@ -59,11 +60,16 @@ public class SSNValidationControllerTest {
         );
     }
 
-    private static Stream<Arguments> invalidSSNRequestsToValidate() {
+    private static Stream<Arguments> ssnRequestsToValidate() {
         return Stream.of(
                 Arguments.of("131052-308", "FI", false),
-                Arguments.of("131052-308T", "SE", false)
+                Arguments.of("131052-308T", "SE", false),
+                Arguments.of("131052U308T", "FI", false),
+                Arguments.of("BOGUS1-NOT0", "FI", false),
+                Arguments.of("131099+453L", "FI", true),
+                Arguments.of("131052-308T", "FI", true),
+                Arguments.of("270368-2050", "FI", true),
+                Arguments.of("010507A632V", "FI", true)
         );
     }
-
 }

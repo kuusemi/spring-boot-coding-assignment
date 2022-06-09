@@ -1,8 +1,7 @@
-package com.digitalistgroup.springbootcodingassignment.models;
+package com.digitalistgroup.springbootcodingassignment.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NonNull;
 
 import javax.validation.constraints.NotNull;
 

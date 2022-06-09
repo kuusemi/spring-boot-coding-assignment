@@ -1,8 +1,8 @@
-package com.digitalistgroup.springbootcodingassignment.controllers;
+package com.digitalistgroup.springbootcodingassignment.controller;
 
-import com.digitalistgroup.springbootcodingassignment.models.ValidateSSNRequestModel;
+import com.digitalistgroup.springbootcodingassignment.model.ValidateSSNRequestModel;
 
-import com.digitalistgroup.springbootcodingassignment.models.ValidateSSNResponseModel;
+import com.digitalistgroup.springbootcodingassignment.model.ValidateSSNResponseModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

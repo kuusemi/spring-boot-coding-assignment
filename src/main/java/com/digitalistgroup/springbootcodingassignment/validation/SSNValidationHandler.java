@@ -1,6 +1,7 @@
 package com.digitalistgroup.springbootcodingassignment.validation;
 
-import com.digitalistgroup.springbootcodingassignment.models.ValidateSSNResponseModel;
+import com.digitalistgroup.springbootcodingassignment.model.ValidateSSNResponseModel;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -15,7 +16,9 @@ public class SSNValidationHandler {
     public ResponseEntity<ValidateSSNResponseModel> handleException(MethodArgumentNotValidException e) {
         log.error("Validation exception occurred: {}", e.getLocalizedMessage());
 
-        return ResponseEntity.ok().body(new ValidateSSNResponseModel(Boolean.valueOf("false")));
+        return ResponseEntity.ok().body(
+                new ValidateSSNResponseModel(false)
+        );
 
     }
 
