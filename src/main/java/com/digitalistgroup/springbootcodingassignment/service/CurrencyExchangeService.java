@@ -5,4 +5,6 @@ import com.digitalistgroup.springbootcodingassignment.model.ExchangeAmountRespon
 
 public interface CurrencyExchangeService {
     ExchangeAmountResponseModel exchangeCurrency(ExchangeAmountRequestModel exchangeAmountRequestModel);
+
+    void storeExchangeRates();
 }
