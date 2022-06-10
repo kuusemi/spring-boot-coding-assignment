@@ -37,7 +37,7 @@ public class SSNValidationControllerTest {
     private JacksonTester<ValidateSSNResponseModel> responseTester;
 
     @BeforeEach
-    public void setuo() {
+    public void setUp() {
         JacksonTester.initFields(this, new ObjectMapper());
 
         mvc = MockMvcBuilders.standaloneSetup(controller)
