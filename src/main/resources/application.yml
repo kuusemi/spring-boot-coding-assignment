@@ -21,3 +21,9 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
+
+exchange:
+  rates:
+    url: https://api.apilayer.com/exchangerates_data/latest?symbols=EUR,USD,SEK&base=EUR
+    apiKey: P7dmXdqP4HocFuag0nc3YBDcjZISHnON
+
