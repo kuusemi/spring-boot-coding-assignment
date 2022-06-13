@@ -2,8 +2,8 @@
 
 ## Introduction
 
-This service implements a JSON REST API that can be used first to validate Social Security Numbers that are in a format
-enforced by the Finnish government and second to convert amount from one currency to another.
+This service implements a JSON REST API that can be used 1) to validate Social Security Numbers that are in a format
+enforced by the Finnish government and 2) to convert amount from one currency to another.
 
 ## Requirements
 
@@ -44,6 +44,8 @@ register
 as a user to the service and obtain a valid API key that needs to be placed into
 the [application.yml](https://raw.githubusercontent.com/kuusemi/spring-boot-coding-assignment/main/src/main/resources/application.yml)
 file to the **exchange.rates.apiKey** property.
+
+Application is using an H2 in-memory database to store the currency exchanges rates locally.
 
 Readily available executable can be built from the command line with a following command:
 
