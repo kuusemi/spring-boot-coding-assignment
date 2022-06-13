@@ -39,7 +39,7 @@ public class CurrencyExchangeController {
             ) String to,
             @RequestParam("from_amount") @NotNull(
                     message = "Exchanged amount can't be empty"
-            ) BigDecimal fromAmount) {
+            ) BigDecimal fromAmount) throws Exception {
 
         ExchangeAmountRequestModel exchangeAmountRequestModel = new ExchangeAmountRequestModel(from, to, fromAmount);
 

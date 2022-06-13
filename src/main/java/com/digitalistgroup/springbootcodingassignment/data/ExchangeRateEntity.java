@@ -1,6 +1,5 @@
 package com.digitalistgroup.springbootcodingassignment.data;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

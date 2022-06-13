@@ -2,11 +2,13 @@ package com.digitalistgroup.springbootcodingassignment.service;
 
 import com.digitalistgroup.springbootcodingassignment.data.ExchangeRateEntity;
 import com.digitalistgroup.springbootcodingassignment.data.ExchangeRateRepository;
+import com.digitalistgroup.springbootcodingassignment.exception.ExchangeRatesNotInitializedException;
 import com.digitalistgroup.springbootcodingassignment.model.BaseCurrency;
 import com.digitalistgroup.springbootcodingassignment.model.ExchangeAmountRequestModel;
 import com.digitalistgroup.springbootcodingassignment.model.ExchangeAmountResponseModel;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,14 +18,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CurrencyExchangeServiceImpl implements CurrencyExchangeService {
 
     public static final String API_KEY_HEADER_NAME = "apiKey";
+    private static final String BASE_CURRENCY = "EUR";
     private final Environment environment;
 
     private final RestTemplate restTemplate;
@@ -31,9 +37,31 @@ public class CurrencyExchangeServiceImpl implements CurrencyExchangeService {
     private final ExchangeRateRepository exchangeRateRepository;
 
     @Override
-    public ExchangeAmountResponseModel exchangeCurrency(ExchangeAmountRequestModel exchangeAmountRequestModel) {
+    public ExchangeAmountResponseModel exchangeCurrency(
+            ExchangeAmountRequestModel exchangeAmountRequestModel) throws ExchangeRatesNotInitializedException {
+        String fromCurrency = exchangeAmountRequestModel.getFrom();
+        String toCurrency = exchangeAmountRequestModel.getTo();
+        BigDecimal fromAmount = exchangeAmountRequestModel.getFromAmount();
+
+        ExchangeRateEntity fromRate =
+                exchangeRateRepository.findByBaseCurrencyAndExchangeCurrency(BASE_CURRENCY, fromCurrency);
+        ExchangeRateEntity toRate =
+                exchangeRateRepository.findByBaseCurrencyAndExchangeCurrency(BASE_CURRENCY, toCurrency);
+
+        if (fromRate == null || toRate == null) {
+            log.error("Exchange rates haven't been initialized properly");
+            throw new ExchangeRatesNotInitializedException("Exchange rates haven't been initialized properly");
+        }
+        BigDecimal baseCurrencyAmount = fromAmount;
+        if (!fromCurrency.equals(BASE_CURRENCY)) {
+            baseCurrencyAmount = fromAmount.divide(
+                    fromRate.getExchangeRate(), new MathContext(6, RoundingMode.HALF_UP));
+        }
+        BigDecimal toAmount = baseCurrencyAmount.multiply(
+                toRate.getExchangeRate(), new MathContext(6, RoundingMode.HALF_UP));
+
         return new ExchangeAmountResponseModel(
-                "EUR", "SEK", BigDecimal.valueOf(143.3890d), BigDecimal.valueOf(1509.34d)
+                fromCurrency, toCurrency, toAmount, toRate.getExchangeRate()
         );
     }
 

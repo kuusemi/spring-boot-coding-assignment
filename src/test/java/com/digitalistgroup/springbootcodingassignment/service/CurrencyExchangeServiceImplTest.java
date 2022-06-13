@@ -2,9 +2,11 @@ package com.digitalistgroup.springbootcodingassignment.service;
 
 import com.digitalistgroup.springbootcodingassignment.data.ExchangeRateEntity;
 import com.digitalistgroup.springbootcodingassignment.data.ExchangeRateRepository;
+import com.digitalistgroup.springbootcodingassignment.exception.ExchangeRatesNotInitializedException;
 import com.digitalistgroup.springbootcodingassignment.model.BaseCurrency;
 
-import org.junit.jupiter.api.BeforeEach;
+import com.digitalistgroup.springbootcodingassignment.model.ExchangeAmountRequestModel;
+import com.digitalistgroup.springbootcodingassignment.model.ExchangeAmountResponseModel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -21,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -44,8 +47,6 @@ public class CurrencyExchangeServiceImplTest {
 
     @InjectMocks
     private CurrencyExchangeServiceImpl service;
-
-
 
     @Test
     public void shouldGetExchangeRatesFromExternalService() {
@@ -104,9 +105,57 @@ public class CurrencyExchangeServiceImplTest {
                 anyString(), any(HttpMethod.class), any(HttpEntity.class), ArgumentMatchers.<Class<BaseCurrency>>any()
         );
         verify(responseEntity, times(1)).getBody();
-        verify(exchangeRateRepository, times(3)).findByBaseCurrencyAndExchangeCurrency(anyString(), anyString());
+        verify(exchangeRateRepository,
+                times(3)).findByBaseCurrencyAndExchangeCurrency(anyString(), anyString());
         verify(exchangeRateRepository, times(3)).save(any(ExchangeRateEntity.class));
 
+    }
+
+    @Test()
+    public void shouldReturnAnErrorWhenExchangeRatesHaveNotBeenInitialized() {
+        // given
+        ExchangeAmountRequestModel fromCurrency =
+                new ExchangeAmountRequestModel("SEK", "USD", BigDecimal.valueOf(104.90d));
+
+        given(exchangeRateRepository.findByBaseCurrencyAndExchangeCurrency(
+                anyString(), anyString())
+        ).willReturn(null);
+
+        // when
+        assertThatThrownBy(() -> service.exchangeCurrency(fromCurrency))
+                .isInstanceOf(ExchangeRatesNotInitializedException.class);
+    }
+
+    @Test
+    public void shouldReturnAValidAnswerWhenCurrencyIsNotExchangedFromBaseCurrency() {
+        // given
+        ExchangeAmountRequestModel fromCurrency =
+                new ExchangeAmountRequestModel("SEK", "USD", BigDecimal.valueOf(104.90d));
+
+        ExchangeRateEntity fromEntity =
+                createExchangeRateEntity("EUR", "SEK", 10.602037d);
+        ExchangeRateEntity toEntity =
+                createExchangeRateEntity("EUR", "USD", 1.046627d);
+
+        given(exchangeRateRepository.findByBaseCurrencyAndExchangeCurrency(anyString(), anyString())).willReturn(
+                fromEntity, toEntity
+        );
+
+        ExchangeAmountResponseModel response = service.exchangeCurrency(fromCurrency);
+
+        verify(exchangeRateRepository, times(2))
+                .findByBaseCurrencyAndExchangeCurrency(anyString(), anyString());
+
+        assertThat(response.getToAmount()).isEqualTo(BigDecimal.valueOf(10.3557d));
+    }
+
+    private ExchangeRateEntity createExchangeRateEntity(String fromCurrency, String toCurrency, double exchangeRate) {
+        ExchangeRateEntity entity = new ExchangeRateEntity();
+        entity.setBaseCurrency(fromCurrency);
+        entity.setExchangeCurrency(toCurrency);
+        entity.setExchangeRate(BigDecimal.valueOf(exchangeRate));
+
+        return entity;
     }
 
     private BaseCurrency createCurrencyExchangeRates() {
