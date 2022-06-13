@@ -38,7 +38,14 @@ After the source code has been imported, project dependencies are automatically 
 
 ### Building executable jar file from the command line
 
-Readily available executable can be build from the command line with a following command:
+Since application is using a 3rd party service to fetch
+the [currency exchange rates](https://apilayer.com/marketplace/exchangerates_data-api#details-tab), one needs to
+register
+as a user to the service and obtain a valid API key that needs to be placed into
+the [application.yml](https://raw.githubusercontent.com/kuusemi/spring-boot-coding-assignment/main/src/main/resources/application.yml)
+file to the **exchange.rates.apiKey** property.
+
+Readily available executable can be built from the command line with a following command:
 
 `./gradlew bootJar`
 
@@ -62,7 +69,8 @@ can be built with the following command from the command line:
 `docker build -t mkuusela/spring-boot-coding-assignment:latest .`
 
 The -t option is optional and the command can be executed without it. The command runs unit tests, builds a bootable jar
-file and creates a container image that can then be used to start a container by issuing a following command from the command line:
+file and creates a container image that can then be used to start a container by issuing a following command from the
+command line:
 
 `docker run -d --rm -p 8090:8090 --name spring-code-assignment mkuusela/spring-boot-coding-assignment:latest`
 
@@ -124,10 +132,10 @@ Success response:
 `
 HTTP/1.1 200
 {
-    "from": "SEK",
-    "to": "USD",
-    "to_amount": 1.0738,
-    "exchange_rate": 1.045785
+"from": "SEK",
+"to": "USD",
+"to_amount": 1.0738,
+"exchange_rate": 1.045785
 }
 `
 
