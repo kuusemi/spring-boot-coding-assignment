@@ -32,7 +32,7 @@ option **New** and from under that option **Project from Existing Sources...**
 Alternatively the source code can be cloned directly to IntelliJ IDEA by selecting from **File** menu
 option **New** and from under that option **Project from Version Control...**
 
-Other integrated development environments, e.g. Eclipse has similar functionality available.
+Other integrated development environments, e.g. Eclipse have similar functionality available.
 
 After the source code has been imported, project dependencies are automatically loaded to the local Gradle cache.
 
